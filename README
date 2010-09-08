@@ -1,0 +1,6 @@
+  * Update the .plist file with your application bundle identifier
+  * Update index.html with your applications key and secret.
+  * Run the application and Enjoy.
+
+  Note the application itself doesn't do anything useful, it just receives push notifications.  Once you have it running you can log into http://go.urbanairship.com and send yourself a test notification.
+
