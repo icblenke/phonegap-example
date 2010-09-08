@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+	<!-- Change this if you want to allow scaling -->
+    <meta name="viewport" content="width=default-width; user-scalable=no" />
+
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+    <title>PhoneGapTest</title>
+    
+    
+	
+	<!-- iPad/iPhone specific css below, add after your main css >
+	<link rel="stylesheet" media="only screen and (max-device-width: 1024px)" href="ipad.css" type="text/css" />		
+	<link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="iphone.css" type="text/css" />		
+	-->
+    <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+    <script type="text/javascript" charset="utf-8" src="PushNotification.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    
+    // app key and secret for your Urban Airship application
+    var HOST = 'https://go.urbanairship.com/';
+    var KEY = ''; // your app key
+    var SECRET = ''; // your app secret
+
+
+
+    /* When this function is called, PhoneGap has been initialized and is ready to roll */
+    function onDeviceReady() {    
+        // IMPORTANT: must start notify after device is ready,
+        // otherwise you will not be able to receive notification in JS callback
+        navigator.pushNotification.startNotify();
+
+        // Typically, you want to register APN every time when app starts
+        registerAPN();
+    }
+
+    /**
+     * Customize following callbacks in your application
+    */
+
+    // Callback when receiving notification
+    PushNotification.prototype.notificationCallback = function (notification) {
+        var msg = '';
+        for (var property in notification) {
+            msg += property + ' : ' + notification[property] + '\n';
+        }
+        alert(msg);
+    };
+
+    // when register APN succeeded
+    function successCallback(e) {
+        alert("Device registered. Device token: " + e.deviceToken);
+    }
+
+    // when register APN failed
+    function errorCallback(e) {
+        alert('Error during registration: '+e.error);
+    }
+
+    // register button action
+    function registerAPN() {
+        navigator.pushNotification.register(successCallback, errorCallback, { alert:true, badge:true, sound:true });
+
+        //specify no parameter or (null, null, {}) to unregister APN
+        //navigator.pushNotification.register();
+    }
+
+
+    // when APN register succeeded
+    function successCallback(e) {
+    registerUAPush(e.deviceToken);
+    }
+
+    // register with Urban Airship push service
+    function registerUAPush(deviceToken) {
+        var request = new XMLHttpRequest();
+        
+        // open the client and encode our URL
+        request.open('PUT', HOST+'api/device_tokens/'+deviceToken, true, KEY, SECRET);
+        
+        // callback when request finished
+        request.onload = function() {
+            if(this.status == 200 || this.status == 201) {
+                // succeeded
+                alert('UA push service successfully registered.');
+            } else {
+                // error
+                alert('Error when registering UA push service.\nError: '+this.statusText);
+            }
+        };
+
+        request.send();
+    }
+
+	// If you want to prevent dragging, uncomment this section
+	/*
+	function preventBehavior(e) 
+	{ 
+      e.preventDefault(); 
+    };
+	document.addEventListener("touchmove", preventBehavior, false);
+	*/
+	
+	function onBodyLoad()
+	{
+		document.addEventListener("deviceready",onDeviceReady,false);
+	}
+	
+    </script>
+  </head>
+  <body onload="onBodyLoad()">
+  	
+  </body>
+</html>
